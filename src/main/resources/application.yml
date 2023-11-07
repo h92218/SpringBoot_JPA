@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/datajpa
+    username : sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        #show_sql: true #로그로 찍어서 주석처리함
+        format_sql: true #쿼리가 이쁘게 나옴
+
+logging.level:
+  org.hibernate.SQL : debug
+  org.hibernate.type : trace #바인딩된 파라미터까지 볼 수 있음
