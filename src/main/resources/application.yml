@@ -15,4 +15,4 @@ spring:
 
 logging.level:
   org.hibernate.SQL : debug
-  org.hibernate.type : trace #바인딩된 파라미터까지 볼 수 있음
+  #org.hibernate.type : trace #바인딩된 파라미터까지 볼 수 있음
