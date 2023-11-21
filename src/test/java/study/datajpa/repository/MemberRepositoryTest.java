@@ -4,6 +4,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -163,5 +167,57 @@ class MemberRepositoryTest {
         Optional<Member> findMember = memberRepository.findOptionalMemberByUsername("asdf");
         System.out.println("findMember = " + findMember);
         //findMember = Optional.empty
+    }
+
+    //JPA 페이징 테스트
+    @Test
+    public void paging(){
+        memberRepository.save(new Member("member1",10));
+        memberRepository.save(new Member("member2",10));
+        memberRepository.save(new Member("member3",10));
+        memberRepository.save(new Member("member4",10));
+        memberRepository.save(new Member("member5",10));
+
+        //주의 : 페이지가 0부터 시작함. 3개 가져오기
+        int age=10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        //반환 타입을 Page로 받으면 totalCount를 가져오는 쿼리도 함께 나감.
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        //페이지를 유지하면서 내부 entity를 dto로 변환하기
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+        //slice : 요청한거보다 1개 더 가져와서 더보기 누르면 보이는 기능. 전체 count를 가져오지 않음.
+        //Slice<Member> page =  memberRepository.findByAge(age, pageRequest);
+
+        List<Member> content = page.getContent();
+        long totalElement = page.getTotalElements();//slice는 totalCount 쿼리를 날리지 않는다.
+
+        for(Member member : content){
+            System.out.println("member = " + member);
+        }
+
+        System.out.println("totalElements : " + totalElement);
+        //totalElements : 5
+
+
+        assertThat(content.size()).isEqualTo(3);
+        assertThat(page.getTotalElements()).isEqualTo(5);
+        assertThat(page.getNumber()).isEqualTo(0);
+        assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue(); //첫번째 페이지냐
+        assertThat(page.hasNext()).isTrue(); //다음페이지가 있냐
+
+
+        /* slice인 경우 확인
+        assertThat(content.size()).isEqualTo(3);
+        //assertThat(page.getTotalElements()).isEqualTo(5); slice는 totalCount 쿼리를 날리지 않는다.
+        assertThat(page.getNumber()).isEqualTo(0);
+        //assertThat(page.getTotalPages()).isEqualTo(2);
+        assertThat(page.isFirst()).isTrue(); //첫번째 페이지냐
+        assertThat(page.hasNext()).isTrue(); //다음페이지가 있냐
+        */
+
     }
 }
