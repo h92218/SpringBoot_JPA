@@ -14,6 +14,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,10 @@ class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     //인터페이스밖에 없는데 동작한다.
     @Autowired TeamRepository teamRepository;
+
+    @PersistenceContext
+    EntityManager em;
+
     @Test
     public void testMember(){
         System.out.println("memberRepository = " + memberRepository.getClass());
@@ -219,5 +225,57 @@ class MemberRepositoryTest {
         assertThat(page.hasNext()).isTrue(); //다음페이지가 있냐
         */
 
+    }
+
+
+    @Test
+    public void bulkUpdate(){
+        memberRepository.save(new Member("member1",10));
+        memberRepository.save(new Member("member2",19));
+        memberRepository.save(new Member("member3",20));
+        memberRepository.save(new Member("member4",21));
+        memberRepository.save(new Member("member5",40));
+
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        //DB에 데이터를 반영하고 영속성 컨텍스트를 지움.
+       //em.flush();
+       //em.clear();
+
+        List<Member> result = memberRepository.findListByUsername("member5");
+        Member member5 = result.get(0);
+        System.out.println("member5 = " + member5);
+        /* member5 = Member(id=5, username=member5, age=40)
+        * bulk 연산은 영속성컨텍스트를 이용하지 않고 바로 DB에 입력을 하므로
+        * 영속성 컨텍스트에는 아직 데이터가 40인것임.
+        * 하지만 flush, clear를 하면 영속성 컨텍스트가 비었기 때문에 db에서 조회해 온다.
+         */
+        assertThat(resultCount).isEqualTo(3);
+    }
+
+    @Test
+    public void findMemberLazy(){
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 10, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        
+        em.flush();
+        em.clear();
+
+        //member 조회하는 쿼리가 나가고 연관된 team 쿼리가 한번 더 나가는 문제가 있음. n+1문제라고 함
+        List<Member> members = memberRepository.findMemberFetchJoin();
+        for(Member member : members){
+            System.out.println("member.getUsername() = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass());
+            //member.teamClass = class study.datajpa.entity.Team$HibernateProxy$yvtonfut (프록시객체)
+            //fetch를 사용하는 경우 member.teamClass = class study.datajpa.entity.Team
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
+        }
     }
 }

@@ -22,8 +22,9 @@ public class Member {
 
     //다대일관계
     @ManyToOne(fetch = FetchType.LAZY)
-    //JPA에서 모든 연관관계는 LAY로 설정할것.
+    //JPA에서 모든 연관관계는 LAY로 설정할것. 지연로딩.
     //Eager(즉시로딩) 설정 시 성능최적화가 힘들다.
+    //team에 LAZY를 걸면 team을 사용하는 시점에 쿼리가 날라감
     @JoinColumn(name="team_id") //외래 키 매핑
     private Team team;
 
