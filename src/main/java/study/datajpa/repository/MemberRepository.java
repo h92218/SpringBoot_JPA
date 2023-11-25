@@ -3,13 +3,13 @@ package study.datajpa.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import javax.persistence.Entity;
+import javax.persistence.QueryHint;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -68,4 +68,21 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     //fetch : member를 조회할 때 연관된 team을 한번에 조회해옴
     @Query("select m from Member m left join fetch m.team")
     List<Member> findMemberFetchJoin();
+
+    @Override
+    @EntityGraph(attributePaths = {"team"}) //fetch join 을 쓰는것과 같음
+    List<Member> findAll();
+
+    //JPQL과 EntityGraph 를 함께 사용할수도 있음
+    @EntityGraph(attributePaths = {"team"})
+    @Query("selectr m from Member m ")
+    List<Member> findMemberEntityGraph();
+
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findEntityGraphByUsername(@Param("username") String username);
+
+
+    //변경감지 체크를 안 함
+    @QueryHints(value=@QueryHint(name = "org.hibernate.readOnly", value ="true"))
+    Member findReadONlyByUsername(String username);
 }

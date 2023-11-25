@@ -269,7 +269,7 @@ class MemberRepositoryTest {
         em.clear();
 
         //member 조회하는 쿼리가 나가고 연관된 team 쿼리가 한번 더 나가는 문제가 있음. n+1문제라고 함
-        List<Member> members = memberRepository.findMemberFetchJoin();
+        List<Member> members = memberRepository.findAll();
         for(Member member : members){
             System.out.println("member.getUsername() = " + member.getUsername());
             System.out.println("member.teamClass = " + member.getTeam().getClass());
