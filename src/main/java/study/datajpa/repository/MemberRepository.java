@@ -9,12 +9,13 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
 import javax.persistence.Entity;
+import javax.persistence.LockModeType;
 import javax.persistence.QueryHint;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member,Long> {
+public interface MemberRepository extends JpaRepository<Member,Long>, MemberRepositoryCustom{
     //구현체는 스프링 데이터 JPA가 생성해준다.
 
     //메서드 이름으로 쿼리를 생성해줌(메서드 이름 규칙 지켜야함)
@@ -75,7 +76,7 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
 
     //JPQL과 EntityGraph 를 함께 사용할수도 있음
     @EntityGraph(attributePaths = {"team"})
-    @Query("selectr m from Member m ")
+    @Query("select m from Member m ")
     List<Member> findMemberEntityGraph();
 
     @EntityGraph(attributePaths = {"team"})
@@ -85,4 +86,12 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     //변경감지 체크를 안 함
     @QueryHints(value=@QueryHint(name = "org.hibernate.readOnly", value ="true"))
     Member findReadONlyByUsername(String username);
+
+
+    /*JPA가 제공하는 LOCK
+     실시간 트래픽이 많은 경우 쓰면 안 좋다.
+     Pessimistic Lock : 동일한 데이터를 동시에 수정할 가능성이 높다는 전제로 잠금을 거는 방식.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String username);
 }

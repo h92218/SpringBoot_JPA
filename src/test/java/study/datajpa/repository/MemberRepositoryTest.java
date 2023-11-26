@@ -278,4 +278,18 @@ class MemberRepositoryTest {
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
         }
     }
+
+    @Test
+    public void lock(){
+        Member member1 = new Member("member1",10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+        List<Member> List = memberRepository.findLockByUsername("member1");
+    }
+
+    @Test
+    public void callCustomTest(){
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
 }
