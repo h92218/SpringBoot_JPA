@@ -11,7 +11,7 @@ import javax.persistence.*;
 //entity는 디폴트 생성자가 있어야 함.
 //jpa에서 프록시 등의 경우에 사용해야 하므로 access level은 protected
 @ToString(of = {"id","username","age"})
-public class Member {
+public class Member extends BaseEntity {
 
     @Id //식별자
     @GeneratedValue //순차적 값을 생성해서 넣어줌
