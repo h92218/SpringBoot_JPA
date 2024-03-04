@@ -41,15 +41,17 @@ JpaRepository(인터페이스)를 상속받는다.
 
 
 @ManyToOne(fetch = FetchType.LAZY)
-다대일 관계,
+다대일 관계.
 @JoinColumn(name="team_id") 으로 외래키 이름을 써 준다.
 연관관계의 주인(두 객체 중 하나의 객체만 테이블을 관리할 수 있는 쪽)이 되는 쪽은 1:N 중에 N쪽임.
 연관관계의 주인만이 외래키를 관리할 수 있다.
 mappedBy 쪽은 읽기만 가능
+
+* 지연로딩, 즉시로딩
 모든 연관관계는 지연로딩해야함(fetch = FetchType.LAZY)
 지연로딩 설정이 되어있는 엔티티는 프록시 객체로 가져오며
 후에 실제 객체를 사용하는 시점에 초기화가 되어 DB 쿼리를 실행한다.
-즉시로딩(EAGER)인 경우 N쪽 객체를 조회하는 시점에 1쪽 객체까지 불러오는 쿼리를 날린다.
+즉시로딩(EAGER)인 경우 N쪽 객체를 조회하는 시점에 1쪽 객체까지 불러오는 쿼리를 날린다. 비효율.
 즉시 로딩은 항상 외부조인을 사용한다.
 fetch의 디폴트 값 : @xxToOne은 EAGER, @xxToMany는 LAZY
 
@@ -65,3 +67,26 @@ mappedBy는 연관관계의 주인이 아닌 것을 표시하는 설정
 flush : 영속성 컨텍스트에서 강제로 DB insert
 clear : 영속성 컨텍스트에서 캐시 비우기
 
+* 스프링 데이터 JPA Repository 인터페이스
+- extends JpaRepository<엔티티타입, PK타입> 
+- Spring Data JPA가 구현체를 자동으로 생성함 
+- @Repository 어노테이션을 생략해도 컴포넌트 스캔을 스프링 데이터 JPA가 자동으로 처리함
+
+* JpaRepository 주요 메서드
+- save : 새로운 엔티티는 저장, 이미 있는 엔티티는 병합
+- delete : 엔티티 삭제. 내부에서 EntityManager.remove() 호출
+- findById : 엔티티 하나 조회. 내부에서 EntityManager.find() 호출
+- getOne : 엔티티를 프록시로 조회. 내부에서 EntityManager.getReference() 호출
+- findAll : 모든 엔티티 조회. 정렬이나 페이징 조건을 파라미터로 제공할 수 있음
+
+
+* 쿼리 메소드 기능
+메소드 이름으로 쿼리 생성
+엔티티의 필드명이 변경되면 인터페이스에 정의한 메서드 이름도 변경해줘야 함
+=> 변경하지 않으면 실행시점에 No property 오류가 뜬다.
+조회 : find by, read by, get by, query by
+count : count By 반환타입 long
+exists : exists by 반환타입 boolean
+delete : delete by, remove by, 반환타입 long
+distinct : findDistinct, findMemberDistinctBy
+limit : findFirst3, findFirst, findTop, findTop3
