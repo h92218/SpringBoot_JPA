@@ -29,13 +29,13 @@ result.getContent() //조회된 데이터
 
 
 ## QuerydslPredicateExecutor
-사용법
+* 사용법*
 JpaRepository를 상속받고있는 repository 인터페이스에 상속 추가
 
-장점
+* 장점*
 EntityManager 주입/JPAQueryFactory생성 << 안 해도 됨
 
-단점
+* 단점*
 join 사용 불가
 메서드 파라미터가 Predicate라 쿼리메서드에 조건절을 직접 넘겨줘야 됨 
 ```java
@@ -45,14 +45,14 @@ repository.findAll(qGoods.useYn.eq(true))
 
 
 ## QueryDslRepositorySupport
-사용법
+* 사용법*
 repository 구현체 클래스에 QuerydslRepositorySupport 상속 
 (GoodsRepositoryImpl 참고)
 
-장점
+* 장점*
 getQuerydsl().applyPagination() 을 사용해서 페이징을 간편하게 구현 
 
-단점
+* 단점*
 스프링 데이터 Sort 사용할 때 버그가 있다고 하는데 아직 잘 모르겠음
 
 
