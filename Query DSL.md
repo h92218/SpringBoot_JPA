@@ -264,7 +264,11 @@ public List<Goods> nplus1test(){
             return result;
 }
 ```
-
+## fetchjoin과 일반 join의 차이
+- 일반 Join : join 조건을 제외하고 실제 질의하는 대상 Entity에 대한 컬럼만 SELECT  
+   연관 엔티티의 컬럼이 조건으로만 사용되고 실제 데이터는 필요하지 않을 경우 쓰면 된다.
+- Fetch Join : 실제 질의하는 대상 Entity와 Fetch join이 걸려있는 Entity를 포함한 컬럼 함께 SELECT   
+   연관 엔티티의 데이터가 필요한 경우 사용
 
 ## lazy loading 사용시 주의점
 https://stackoverflow.com/questions/30082281/manytoonefetch-fetchtype-lazy-doesnt-work-on-non-primary-key-referenced-co 참고   
